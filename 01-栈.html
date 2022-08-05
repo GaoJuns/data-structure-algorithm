@@ -1,0 +1,92 @@
+!
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>数据结构-栈</title>
+</head>
+
+<body>
+    <script>
+        /*
+        栈结构
+
+        特点：先进后出有序集合
+
+        方法：
+        push():添加一个（或多个）新元素到栈顶
+
+        pop():移除栈顶的元素，并且返回被移除的元素
+
+        peek():返回栈顶的元素，不对栈做任何修改
+
+        isEmpty():如果栈里没有任何元素就返回true,否则返回false
+
+        clear():移除栈里的所有元素
+
+        size():返回栈里的元素个数
+
+        toString(): 返回栈元素字符串
+
+        */
+
+
+        class Stack {
+
+            // 属性
+            constructor() {
+                this.stack = [];
+            };
+
+            push(v) {
+                this.stack.push(v);
+                return this
+            };
+
+            pop() {
+                return this.stack.pop();
+            };
+
+            peek() {
+                return this.stack[this.stack.length - 1];
+            };
+
+            size() {
+                return this.stack.length;
+            };
+
+            clear() {
+                this.stack = [];
+                return this;
+            };
+
+            isEmpty() {
+                return this.stack.length == 0;
+            };
+
+            toString() {
+                return this.stack.join('-');
+            };
+        }
+
+
+        let stack = new Stack();
+        stack.push(1);
+        stack.push(2);
+        stack.push(3);
+        stack.push(4);
+
+        console.log('原始数据：', stack.toString())
+        console.log('pop', stack.pop())
+        console.log('peek', stack.peek())
+        console.log('size', stack.size())
+        console.log('isEmpty', stack.isEmpty())
+        console.log('clear', stack.clear())
+        console.log('isEmpty', stack.isEmpty())
+    </script>
+</body>
+
+</html>

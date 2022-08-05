@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>数据结构-堆</title>
+</head>
+
+<body>
+    <script>
+        /*
+        堆结构，是一颗完全二叉树
+
+        大顶堆：父节点大于子节点，根元素微最大值
+
+        小顶堆：父节点小于子节点，根元素为最小值
+
+        获取父节点：（i-1）/2
+
+        获取左节点：（i*2）+1
+
+        获取右节点：（i*2）+2
+
+        */
+
+        class Heap {
+
+            /*
+             * cmp:
+             * a < b: 小顶堆
+             * a > b: 大顶堆
+             */
+            constructor(arr = [], cmp = (a, b) => a < b) {
+                this.arr = arr;
+                this.cmp = cmp;
+                this.heapify();
+            }
+
+            // 初始化堆
+            heapify() {
+                if (this.size() <= 1) return;
+
+                // 将数据进行堆调整
+                for (let i = 0; i < this.size(); i++) {
+                    this.bubbleUp(i);
+                }
+            }
+
+            // 获取父节点
+            getParentIndex(i) {
+                return Math.floor((i - 1) / 2);
+            }
+
+            // 获取左节点
+            getLeftIndex(i) {
+                return Math.floor(i * 2 + 1);
+            }
+
+            // 获取右节点
+            getRightIndex(i) {
+                return Math.floor(i * 2 + 2);
+            }
+
+            // 交换值
+            swap(left, right) {
+                [this.arr[left], this.arr[right]] = [this.arr[right], this.arr[left]];
+            }
+
+            //插入节点
+            push(v) {
+                this.arr.push(v);
+                this.bubbleUp(this.size() - 1);
+            }
+
+            //删除堆顶元素
+            pop() {
+                if (!this.size()) return null;
+                if (this.size() === 1) return this.arr.pop()
+
+                // 保存堆顶
+                const top = this.arr[0];
+
+                //把堆顶元素替换为堆的最后一个元素
+                this.arr[0] = this.arr.pop();
+
+                //向下调整
+                this.bubbleDown(0);
+
+                return top;
+            }
+
+            // 上移节点
+            bubbleUp(index) {
+
+                // index == 0 时结束
+                while (index) {
+
+                    // 获取父节点索引
+                    const parentIndex = Math.floor((index - 1) / 2);
+
+                    // 小顶堆：如果当前节点小于父节点，交换位置
+                    // 大顶堆：如果当前节点大于父节点，交换位置
+                    if (this.cmp(this.arr[index], this.arr[parentIndex])) {
+                        this.swap(index, parentIndex)
+                        index = parentIndex;
+                    } else {
+                        break;
+                    }
+
+                }
+            }
+
+            //下移节点
+            bubbleDown(index) {
+
+                // 循环次数
+                const lastIndex = this.size() - 1;
+
+                while (index < lastIndex) {
+
+                    // 记录当前节点
+                    let findIndex = index;
+
+                    // 获取左子节点
+                    const leftIndex = this.getLeftIndex(index);
+
+                    // 获取右子节点
+                    const rightIndex = this.getRightIndex(index);
+
+                    // 小顶堆:如果左子节点小于当前节点，记录位置
+                    // 大顶堆:如果左子节点大于当前节点，记录位置
+                    if (leftIndex <= lastIndex && this.cmp(this.arr[leftIndex], this.arr[findIndex])) {
+                        findIndex = leftIndex;
+                    }
+
+                    // 小顶堆:如果右子节点小于当前节点，记录位置
+                    // 大顶堆:如果右子节点大于当前节点，记录位置
+                    if (rightIndex <= lastIndex && this.cmp(this.arr[rightIndex], this.arr[findIndex])) {
+                        findIndex = rightIndex;
+                    }
+
+                    // 进行位置交换
+                    if (findIndex > index) {
+                        this.swap(findIndex, index);
+                        index = findIndex
+                    } else {
+                        break;
+                    }
+
+                }
+            }
+
+            // 获取堆顶
+            peek() {
+                return this.arr[0];
+            }
+
+            // 获取堆的大小
+            size() {
+                return this.arr.length;
+            }
+
+            // 转为字符串
+            toString() {
+                return this.arr.join('-');
+            }
+        }
+
+
+        let minHeap = new Heap([5, 2, 6, 3, 1, 0, 7]);
+        console.log('小顶堆:', minHeap.toString())
+        minHeap.push(4)
+        console.log('push:', minHeap.toString())
+        minHeap.pop()
+        console.log('pop:', minHeap.toString())
+
+        let maxHeap = new Heap([5, 2, 6, 3, 1, 0, 7], (a, b) => a > b);
+        console.log('大顶堆:', maxHeap.toString())
+        maxHeap.push(4)
+        console.log('push:', maxHeap.toString())
+        maxHeap.pop()
+        console.log('pop:', maxHeap.toString())
+
+
+        // 寻找第k大数字
+        let kHeap = new Heap([5, 2, 6, 3, 1, 0, 7]);
+        let k = 5;
+        let res = null;
+        for (let i = 0; i < k; i++) {
+            if (i < k) {
+                kHeap.pop()
+            }
+
+            res = kHeap.peek();
+        }
+
+        console.log(k)
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>数据结构-哈希表</title>
+</head>
+
+<body>
+    <script>
+        /*
+        数组的优点：根据索引读取速度快
+        数组的缺点：
+        1. 通过值去查询，为线性查找，速度慢，效率低
+        2. 插入删除操作，需要进行元素的前移后移操作，消耗性能
+        */
+
+
+        /*
+        哈希表:
+        非连续性数组，将特定值转为数组索引，进行读写操作
+
+        概念：
+        哈希化：将大数字转化成为数组范围内下标的过程。
+        哈希函数：通常我们将单词转成大数字，大数字在进行哈希化的代码实现放在一个函数中，这个函数就是哈希函数。
+        哈希表：最终将数据插入到这个数组，对整个结构的封装，称之为一个哈希表。
+
+        优点：通过特定索引查找，读写速度快
+
+        缺点：空间浪费
+
+        解决冲突方法：链地址法、开放地址法
+
+        填装因子:
+        填装因子表示当前哈希表中已包含的数据项和整个哈希表长度的比值。
+        填装因子=总数据项/哈希表长度
+        平均探测长度及平均存取时间，取决于填装因子，随着填装因子变大，探测长度也越长。
+        开放地址发的填装因子最大为1，链地址法的填装因子可以大于1.
+
+        扩容思想:
+        当填装因子>0.75的时候进行扩容；当填装因子<0.25的时候进行缩容。
+        不管是扩容还是缩容，要保证哈希表容量恒为质数，因为只有是质数，才能在让数据分布更平均。
+
+        用质数的原因：用质数z进行取模运算，得出的结果在 0-(z-1) 之间
+
+
+        方法：
+        put(k,v): 添加、修改元素
+
+        remove(v): 删除元素
+
+        get(v): 如果元素在集合中，返回true，否则返回false。
+
+        isEmpty(): 是否为空。
+
+        size(): 返回数量。
+
+        */
+
+
+        class HashTable {
+
+            // 相关属性
+            constructor() {
+                this.storage = []; // 容器
+                this.size = 7; // 容量，为质素，便于分布均匀
+                this.count = 0; // 数量
+            }
+
+            // 哈希函数
+            static hashFn(key, size) {
+                let hashCode = 0;
+
+                for (let i = 0; i < key.length; i++) {
+                    hashCode = hashCode * 37 + key.charCodeAt(i);
+                }
+
+                // 取模，0-(size-1) 范围内
+                let index = hashCode % size;
+                return index
+            }
+
+            // 判断是否是质数
+            static isPrime(num) {
+
+                var temp = parseInt(Math.sqrt(num));
+
+                for (let i = 2; i <= temp; i++) {
+                    if (num % i == 0) {
+                        return false
+                    }
+                    return true;
+                }
+            }
+
+            // 获取质数
+            static getPrime(num) {
+
+                while (!HashTable.isPrime(num)) {
+                    num++
+                }
+
+                return num;
+            }
+
+            // 扩容
+            resize(newSize) {
+
+                // 保存原数据
+                let oldStorage = this.storage;
+
+                // 重置数据
+                this.storage = [];
+                this.count = 0;
+                this.size = newSize;
+
+                // 数据迁移
+                for (let i = 0; i < oldStorage.length; i++) {
+                    let bucket = oldStorage[i];
+                    if (bucket == null) continue;
+
+                    for (let j = 0; j < bucket.length; j++) {
+                        let tuple = bucket[j];
+                        this.put(tuple[0], tuple[1])
+                    }
+                }
+            }
+
+
+            // 添加、修改元素
+            put(key, value) {
+                let index = HashTable.hashFn(key, this.size); // 根据key获取对应的index
+                let bucket = this.storage[index]; // 根据index获取对应的bucket
+
+                // 判断是否存在当前索引对应的元素
+                if (!bucket) {
+                    bucket = []
+                    this.storage[index] = bucket;
+                }
+
+                // 如果已存在，就修改
+                for (let i = 0; i < bucket.length; i++) {
+                    let tuple = bucket[i];
+                    if (tuple[0] == key) {
+                        tuple[1] = value;
+                        return
+                    }
+                }
+
+                // 如果不存在，就添加
+                bucket.push([key, value]);
+                this.storage[index] = bucket;
+
+                // 长度+1
+                this.count++
+
+                // 扩容
+                if (this.count > this.size * 0.75) {
+                    const newPrime = HashTable.getPrime(this.size * 2)
+                    this.resize(newPrime)
+                }
+            }
+
+            // 删除元素
+            remove(key) {
+                let index = HashTable.hashFn(key, this.size); // 根据key获取对应的index
+                let bucket = this.storage[index]; // 根据index获取对应的bucket
+
+                if (!bucket) return null;
+
+                for (let i = 0; i < bucket.length; i++) {
+                    let tuple = bucket[i]
+
+                    if (tuple[0] == key) {
+                        bucket.splice(i, 1);
+                        this.count--;
+
+                        // 缩容
+                        if (this.size > 7 && this.count < this.size * 0.75) {
+                            let newPrime = HashTable.getPrime(Math.floor(this.size / 2));
+                            this.resize(newPrime)
+                        }
+
+                        return tuple[1];
+                    }
+                }
+
+
+
+                return null;
+            }
+
+            // 获取指定元素
+            get(key) {
+                let index = HashTable.hashFn(key, this.size); // 根据key获取对应的index
+                let bucket = this.storage[index]; // 根据index获取对应的bucket
+
+                if (!bucket) return null;
+
+                for (let i = 0; i < bucket.length; i++) {
+                    let tuple = bucket[i]
+                    if (tuple[0] == key) {
+                        return tuple[1];
+                    }
+                }
+
+                return null;
+            }
+
+            // 是否为空
+            isEmpty() {
+                return this.count === 0;
+            }
+
+            // 元素数量
+            size() {
+                return this.count;
+            }
+
+        }
+
+        const hashTable = new HashTable();
+        console.log(hashTable)
+        hashTable.put('v1', 1);
+        hashTable.put('v2', 2);
+        hashTable.put('v3', 3);
+        hashTable.put('v4', 4);
+        hashTable.put('v5', 5);
+        hashTable.put('v6', 6);
+        console.log(hashTable)
+
+        hashTable.remove('v4');
+        hashTable.remove('v5');
+        hashTable.remove('v6');
+        console.log(hashTable)
+
+        let v2 = hashTable.get('v2');
+        console.log(v2);
+    </script>
+</body>
+
+</html>

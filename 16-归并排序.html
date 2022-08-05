@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>排序算法-归并</title>
+</head>
+
+<body>
+    <script>
+        /*
+         * 归并排序
+         * 1.选择数组中位数作为基准二分查找
+         * 2.将基准前的元素和基准后（包括基准）的元素重新选择基准二分查找
+         * 3.将前后两个数组进行合并
+         *
+         */
+        function mergeSort(arr) {
+            let length = arr.length;
+            if (length < 2) return arr;
+
+            let mid = Math.floor(length / 2);
+            let left = arr.slice(0, mid);
+            let right = arr.slice(mid);
+
+            return merge(mergeSort(left), mergeSort(right));
+        }
+
+        // 合并
+        function merge(left, right) {
+            let result = [];
+
+            while (left.length && right.length) {
+                if (left[0] <= right[0]) {
+                    result.push(left.shift());
+                } else {
+                    result.push(right.shift());
+                }
+            }
+
+            while (left.length) result.push(left.shift());
+            while (right.length) result.push(right.shift());
+            return result;
+        }
+
+
+        let arr = [5, 4, 6, 8, 1, 3, 7, 2];
+        console.log('origin:', arr);
+
+        let res = mergeSort(arr);
+        console.log('result:', res);
+    </script>
+</body>
+
+</html>

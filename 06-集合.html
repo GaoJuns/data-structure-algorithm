@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>数据结构-集合</title>
+</head>
+
+<body>
+    <script>
+        /*
+        集合：
+        由一组无序且唯一（即不能重复）的元素组成
+
+        方法：
+        add(v): 添加元素
+
+        delete(v): 删除元素
+
+        has(v): 如果元素在集合中，返回true，否则返回false。
+
+        clear(): 移除集合中的所有元素。
+
+        size(): 返回集合所包含元素的数量。它与数组的length属性相同。
+
+        values(): 返回一个包含集合中所有值（元素）的数组。
+
+        */
+
+        class Set {
+            constructor(arr = []) {
+                this.items = {};
+                this.init(arr);
+            }
+
+            init(arr) {
+                const length = arr.length;
+
+                if (length) {
+                    for (let i = 0; i < length; i++) {
+
+                        if (this.has(arr[i])) {
+                            break;
+                        }
+
+                        this.add(arr[i])
+                    }
+                }
+
+                return this;
+            }
+
+            // 添加
+            add(v) {
+                if (!this.has(v)) this.items[v] = v;
+                return this;
+            }
+
+            // 删除
+            delete(v) {
+                if (this.has(v)) delete this.items[v];
+                return this;
+            }
+
+            // 是否存在
+            has(v) {
+                return this.items.hasOwnProperty(v);
+            }
+
+            // 清空
+            clear() {
+                this.items = {};
+                return this;
+            }
+
+            // 长度
+            size() {
+                return Object.keys(this.items).length;
+            }
+
+            // 返回所有项
+            values() {
+                return Object.values(this.items);
+            }
+        }
+
+        const set = new Set([1, 2, 3, 4, 5, 1, 2, 3]);
+
+        set.add(1)
+        set.add(6)
+        set.add(7)
+        console.log('add', set)
+
+        set.delete(1)
+        console.log('delete', set)
+
+        const has1 = set.has(1)
+        console.log('has-1', has1)
+
+        const has2 = set.has(2)
+        console.log('has-2', has2)
+
+        console.log('size', set.size())
+
+        console.log('values', set.values())
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>数据结构-二叉搜索树</title>
+</head>
+
+<body>
+    <script>
+        /*
+        二叉搜索树
+
+        特点：
+        1.左子树节点的值始终小于父节点值
+        2.右子树节点的值始终大于父节点值
+        3.左右子树都是二叉搜索树
+
+        遍历方式：
+        1.前序遍历
+        2.中序遍历
+        3.后序遍历
+
+        前驱：比当前节点小一点点
+        后继：比当前节点大一点点
+
+        方法：
+        insert(v): 插入节点
+
+        remove(v): 删除节点
+
+        preOrderTraversal(): 先序遍历
+
+        midOrderTraversal(): 中序遍历
+
+        postOrderTraversal(): 后序遍历
+
+        min(): 最小值
+
+        max(): 最大值
+
+        search(v): 查找值
+
+        reverse(v): 翻转
+
+        */
+
+        class BinarySearchTree {
+
+            // 相关属性
+            constructor(arr = []) {
+                this.root = null;
+                this.initial(arr)
+            }
+
+
+            /*
+            寻找后继节点
+            前驱：比当前节点小一点点
+            后继：比当前节点大一点点
+            */
+            static getSuccessor(node) {
+                let successor = node; // 记录后继节点
+                let successorParent = node; // 删除节点父节点
+                let current = node.right; // 从要删除的右子节点开始找
+
+                while (current) {
+                    successorParent = successor; // 父节点
+                    successor = current;
+                    current = current.left;
+                }
+
+                if (successor != node.right) {
+                    successorParent.left = successor.right;
+                    successor.right = node.right;
+                }
+
+                console.log('successor:', successor)
+                return successor;
+            }
+
+            // 初始化
+            initial(arr) {
+                if (!arr.length) return null
+                for (let i = 0; i < arr.length; i++) {
+                    this.insert(arr[i]);
+                }
+            }
+
+            // 插入节点
+            insert(value) {
+
+                const node = new Node(value);
+
+                // 插入根节点
+                if (this.root === null) {
+                    this.root = node;
+                } else {
+                    let currentNode = this.root;
+
+                    while (currentNode) {
+
+                        // 插入左子树
+                        if (currentNode.value > value) {
+                            if (currentNode.left == null) {
+                                currentNode.left = node;
+                                break;
+                            }
+                            currentNode = currentNode.left;
+                        } else { // 插入右子树
+                            if (currentNode.right == null) {
+                                currentNode.right = node;
+                                break;
+                            }
+                            currentNode = currentNode.right;
+                        }
+                    }
+                }
+
+            }
+
+            /*
+            删除节点
+
+            3种情况：
+            1. 删除节点没有字节点
+            2. 删除节点只有一个子节点
+            3. 删除节点有两个子节点
+            */
+            remove(value) {
+                // 定义变量
+                let current = this.root;
+                let parent = null;
+                let isLeftChild = true;
+
+                // 开始寻找节点
+                while (current.value != value) {
+                    parent = current;
+
+                    if (value < current.value) {
+                        isLeftChild = true;
+                        current = current.left;
+                    } else {
+                        isLeftChild = false;
+                        current = current.right;
+                    }
+
+                    // 没有找到节点返回 false
+                    if (current == null) return false;
+                }
+
+                // 1. 删除节点没有子节点
+                if (current.left == null && current.right == null) {
+                    if (current == this.root) {
+                        this.root = null
+                    } else if (isLeftChild) {
+                        parent.left = null;
+                    } else {
+                        parent.right = null;
+                    }
+                }
+
+                // 2. 删除节点有一个子节点
+                else if (current.right == null) {
+                    // 只有左节点
+                    if (current = this.root) {
+                        this.root = current.left;
+                    } else if (isLeftChild) {
+                        parent.left = current.left;
+                    } else {
+                        parent.right = current.left
+                    }
+                } else if (current.left == null) {
+                    // 只有右节点
+                    if (current == this.root) {
+                        this.root = current.right;
+                    } else if (isLeftChild) {
+                        parent.left = current.right;
+                    } else {
+                        parent.right = current.right;
+                    }
+                }
+
+                // 3. 删除节点有两个子节点，寻找后继节点，后继节点永远是当前节点下最后面的一个左子节点
+                else {
+                    let successor = BinarySearchTree.getSuccessor(current);
+
+                    if (current == this.root) {
+                        this.root = successor;
+                    } else if (isLeftChild) {
+                        parent.left = successor;
+                    } else {
+                        parent.right = successor;
+                    }
+
+                    successor.left = current.left;
+                }
+
+                return this;
+            }
+
+            // 先序遍历
+            preOrderTraversal(cb) {
+                const map = function (node) {
+                    if (!node) return null;
+
+                    cb && cb(node.value);
+                    map(node.left)
+                    map(node.right)
+                }
+                map(this.root);
+            }
+
+            // 中序遍历
+            midOrderTraversal(cb) {
+                const map = function (node) {
+                    if (!node) return null;
+
+                    map(node.left)
+                    cb && cb(node.value);
+                    map(node.right)
+                }
+                map(this.root);
+            }
+
+            // 后序遍历
+            postOrderTraversal(cb) {
+                const map = function (node) {
+                    if (!node) return null;
+
+                    map(node.left)
+                    map(node.right)
+                    cb && cb(node.value);
+                }
+                map(this.root);
+            }
+
+            // 获取最小值
+            min() {
+                let currentNode = this.root;
+
+                while (currentNode.left) {
+                    currentNode = currentNode.left;
+                }
+
+                return currentNode.value;
+            }
+
+            // 获取最大值
+            max() {
+                let currentNode = this.root;
+
+                while (currentNode.right) {
+                    currentNode = currentNode.right;
+                }
+
+                return currentNode.value;
+            }
+
+            // 查找值
+            search(v) {
+                let currentNode = this.root;
+
+                while (currentNode) {
+                    if (v < currentNode.value) {
+                        currentNode = currentNode.left;
+                    } else if (v > currentNode.value) {
+                        currentNode = currentNode.right;
+                    } else {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
+            // 反转
+            reverse() {
+                function _reverse(node) {
+                    if (!node) return null;
+
+                    let tmp = node.left;
+                    node.left = node.right;
+                    node.right = tmp;
+
+                    _reverse(node.left);
+                    _reverse(node.right);
+                }
+
+
+                _reverse(this.root);
+                return this;
+            }
+        }
+
+
+        // 子节点类
+        class Node {
+            constructor(value) {
+                this.value = value;
+                this.left = null;
+                this.right = null;
+            }
+        }
+
+
+        let tree = new BinarySearchTree([5, 4, 9, 3]);
+        tree.insert(7)
+        tree.insert(1)
+        tree.insert(10)
+
+        console.log(tree)
+
+        // 先序遍历
+        let preOrderStr = ''
+        tree.preOrderTraversal((v) => {
+            preOrderStr += v + ' ';
+        })
+        console.log('preOrderStr:', preOrderStr)
+
+        // 中序遍历
+        let midOrderStr = ''
+        tree.midOrderTraversal((v) => {
+            midOrderStr += v + ' ';
+        })
+        console.log('midOrderStr:', midOrderStr)
+
+        // 后序遍历
+        let postOrderStr = ''
+        tree.postOrderTraversal((v) => {
+            postOrderStr += v + ' ';
+        })
+        console.log('postOrderStr:', postOrderStr)
+
+        // min
+        console.log('min:', tree.min())
+
+        // max
+        console.log('max:', tree.max())
+
+        // search
+        console.log('search1:', tree.search(1))
+        console.log('search11:', tree.search(11))
+
+        // 删除后中序遍历
+        let midOrderStrs = ''
+        tree.remove(5).remove(1).midOrderTraversal((v) => {
+            midOrderStrs += v + ' ';
+        })
+        console.log('midOrderStrs:', midOrderStrs)
+
+        // 反转后中序遍历
+        let reverseStr = ''
+        tree.reverse().midOrderTraversal((v) => {
+            reverseStr += v + ' ';
+        })
+        console.log('reverseStr:', reverseStr)
+    </script>
+</body>
+
+</html>

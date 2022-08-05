@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>数据结构 - 双向链表</title>
+</head>
+
+<body>
+    <script>
+        /*
+        双向链表：
+        链表是多个元素组成的列表
+        元素存储不连续，用next指针连接到一起
+        双向链表可以能从头到尾或从尾到头线性查找
+
+        方法：
+        append(v):在尾端添加一个新节点
+
+        insert(i,v):在某个节点插入一个新节点
+
+        update(i,v):更新某个节点
+
+        get(i):查找某个节点
+
+        indexOf(v): 返回某个节点的位置
+
+        remvoe(v): 删除节点
+
+        removeAt(i): 根据索引删除节点
+
+        size():返回链表长度
+
+        clear(): 清空
+
+        isEmpty(): 是否为空
+
+        toString(): 返回前序字符串
+
+        forwardString(): 返回链表前序字符串
+
+        backwardString(): 返回链表后序字符串
+
+        getHeadVal(): 返回第一个节点
+
+        getTailVal(): 返回最后一个节点
+
+        */
+        class DoublyLinkedList {
+            constructor() {
+                this.head = null;
+                this.tail = null;
+                this.length = 0;
+            }
+
+            // 添加新节点
+            append(value) {
+
+                // 创建一个新节点
+                const newNode = new Node(value);
+
+                if (this.length === 0) {
+                    this.head = newNode;
+                    this.tail = newNode;
+                } else {
+                    newNode.prev = this.tail;
+                    this.tail.next = newNode;
+                    this.tail = newNode;
+                }
+
+                // 长度
+                this.length++;
+            }
+
+            // 插入节点
+            insert(index, node) {
+                // 越界判断
+                if (index < 0 || index > this.length) throw new Error(`index: ${index} error`);
+
+                // 创建新节点
+                const newNode = new Node(node);
+
+                if (this.length === 0) {
+                    this.head = newNode;
+                    this.tail = newNode;
+                } else {
+
+                    if (index == 0) { // 在第一项插入
+                        this.head.prev = newNode;
+                        newNode.next = this.head;
+                        this.head = newNode;
+                    } else if (index === this.length) { // 在最后一项插入
+                        this.tail.next = newNode;
+                        newNode.prev = this.tail;
+                        this.tail = newNode;
+                    } else { // 在中间插入
+                        let i = 0,
+                            currentNode = this.head;
+
+                        while (i++ < index) {
+                            currentNode = currentNode.next;
+                        }
+
+                        // 改变指针
+                        newNode.next = currentNode
+                        newNode.prev = currentNode.prev;
+                        currentNode.prev.next = newNode;
+                        currentNode.prev = newNode;
+                    }
+                }
+
+                this.length++
+            }
+
+
+            // 更新节点
+            update(index, value) {
+                // 越界判断
+                if (index < 0 || index > this.length) throw new Error(`index: ${index} error`);
+
+                let currentNode = this.head;
+                let i = 0;
+
+                // 找到对应的节点
+                while (i++ < index) {
+                    currentNode = currentNode.next;
+                }
+                currentNode.value = value;
+            }
+
+            // 根据索引获取某个节点的数据
+            get(index) {
+                // 越界判断
+                if (index < 0 || index > this.length) throw new Error(`index: ${index} error`);
+
+                let currentNode = this.head;
+                let i = 0;
+
+                // 找到对应的节点
+                while (i++ < index) {
+                    currentNode = currentNode.next;
+                }
+                return currentNode.value;
+            }
+
+            // 根据值获取索引
+            indexOf(value) {
+                const notFound = -1;
+                let i = 0,
+                    currentNode = this.head;
+
+                while (currentNode) {
+
+                    // 找到对应的节点
+                    if (currentNode.value == value) {
+                        return i;
+                    }
+
+                    // 继续找节点
+                    i++;
+                    currentNode = currentNode.next;
+                }
+
+                return notFound;
+            }
+
+            // 根据索引删除
+            removeAt(index) {
+                // 越界判断
+                if (index < 0 || index > this.length) throw new Error(`index: ${index} error`);
+
+                // 仅有一个节点
+                if (this.length == 1) {
+                    this.head = null;
+                    this.tail = null;
+                } else { // 多个节点
+                    if (index === 0) { // 删除头
+                        this.head.next.prev = null
+                        this.head = this.head.next;
+                    } else if (index === this.length) { // 删除尾
+                        this.tail.prev.next = null;
+                        this.tail = this.tail.prev;
+                    } else { // 删除中间
+
+                        let i = 0,
+                            currentNode = this.head;
+
+                        // 找到对应节点
+                        while (i++ < index) {
+                            currentNode = currentNode.next;
+                        }
+
+                        // 改变指针
+                        currentNode.prev.next = currentNode.next;
+                        currentNode.next.prev = currentNode.prev;
+                    }
+                }
+
+                this.length--;
+            }
+
+            // 根据值删除
+            remove(value) {
+                const i = this.indexOf(value);
+                this.removeAt(i)
+            }
+
+            // 默认前序遍历
+            toString() {
+                return this.forwardString();
+            }
+
+            // 前序遍历
+            forwardString() {
+                let currentNode = this.head;
+                let resultString = '';
+
+                while (currentNode) {
+                    resultString += currentNode.value + ' ';
+                    currentNode = currentNode.next;
+                }
+
+                return resultString;
+            }
+
+            // 后序遍历
+            backwardString() {
+                let currentNode = this.tail;
+                let resultString = '';
+
+                while (currentNode) {
+                    resultString += currentNode.value + ' ';
+                    currentNode = currentNode.prev;
+                }
+
+                return resultString;
+            }
+
+            // 清空
+            clear() {
+                this.head = null;
+                this.tail = null;
+                this.length = 0;
+            }
+
+            // 返回头
+            getHeadVal() {
+                return this.head.value;
+            }
+
+            // 返回头
+            getTailVal() {
+                return this.tail.value;
+            }
+
+            // isEmpty
+            isEmpty() {
+                return this.length === 0;
+            }
+
+            // size
+            size() {
+                return this.length;
+            }
+
+        }
+
+
+        class Node {
+            constructor(value) {
+                this.value = value;
+                this.prev = null;
+                this.next = null;
+            }
+        }
+
+        const doublyLinkedList = new DoublyLinkedList();
+
+        // 1. append 方法
+        doublyLinkedList.append('1')
+        doublyLinkedList.append('2')
+        doublyLinkedList.append('3')
+        doublyLinkedList.append('5')
+
+        doublyLinkedList.insert(2, '4')
+        console.log('toString', doublyLinkedList.toString())
+        console.log('size', doublyLinkedList.size())
+
+        doublyLinkedList.update(0, '6')
+        console.log('toString', doublyLinkedList.toString())
+
+        let v = doublyLinkedList.get(1)
+        console.log('getv', v)
+
+        let i = doublyLinkedList.indexOf(6)
+        console.log('indexOf', i)
+
+        doublyLinkedList.removeAt(1)
+        console.log('removeAt', doublyLinkedList.toString())
+
+        doublyLinkedList.remove(4)
+        console.log('remove', doublyLinkedList.toString())
+
+        console.log('getHeadVal', doublyLinkedList.getHeadVal())
+        console.log('getTailVal', doublyLinkedList.getTailVal())
+
+        console.log('size', doublyLinkedList.size())
+        console.log('isEmpty', doublyLinkedList.isEmpty())
+
+        doublyLinkedList.clear()
+        console.log('clear', doublyLinkedList)
+        console.log('size', doublyLinkedList.size())
+        console.log('isEmpty', doublyLinkedList.isEmpty())
+    </script>
+</body>
+
+</html>

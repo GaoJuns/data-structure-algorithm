@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>排序算法-插入</title>
+</head>
+
+<body>
+    <script>
+        /*
+         * 插入排序
+         * 1.将当前值与前面已经排序好的进行比较，默认从 1 开始
+         * 2.如果前面的值比当前值大，就将前面的值往后移动
+         * 3.如果前面的值比当前值小，在后面插入当前值
+         *
+         * 时间复杂度：O(n^2)
+         */
+        function insertionSort(array) {
+
+            for (let i = 1; i < array.length; i++) {
+
+                // 记录选出元素
+                let current = array[i],
+                    j = i;
+
+                // 内循环记录插入位置
+                while (current < array[j - 1] && j > 0) {
+                    array[j] = array[j - 1]; // 将已排序的往后移
+                    j--; // 记录已往后移的元素位置
+                }
+
+                array[j] = current;
+                console.log(`插入-第${i}次排序:${array}`)
+            }
+
+            return array;
+        }
+
+        let arr = [5, 4, 6, 8, 1, 3, 7, 2];
+        console.log('origin:', arr);
+
+        let res = insertionSort(arr);
+        console.log('result:', res);
+    </script>
+</body>
+
+</html>

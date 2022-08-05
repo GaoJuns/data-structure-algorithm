@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>数据结构-单向链表</title>
+</head>
+
+<body>
+
+    <script>
+        /*
+        单向链表：
+        链表是多个元素组成的列表
+        元素存储不连续，用next指针连接到一起
+        单向链表
+
+        方法：
+        append(v):在尾端添加一个新节点
+
+        insert(i,v):在某个节点插入一个新节点
+
+        update(i,v):更新某个节点
+
+        get(i):查找某个节点
+
+        indexOf(v): 返回某个节点的位置
+
+        remvoe(v): 删除节点
+
+        removeAt(i): 根据索引删除节点
+
+        size():返回链表长度
+
+        isEmpty(): 是否为空
+
+        toString(): 返回链表元素字符串
+
+        */
+        class LinkedList {
+
+            constructor() {
+                this.head = null;
+                this.length = 0;
+            }
+
+            // 添加一个新节点
+            append(node) {
+
+                // 创建一个新节点
+                const newNode = new Node(node);
+
+                // 如果链表为空
+                if (this.length === 0) {
+                    this.head = newNode;
+                } else {
+
+                    // 循环找到最后一个节点
+                    let currentNode = this.head;
+                    while (currentNode.next) {
+                        currentNode = currentNode.next;
+                    }
+                    currentNode.next = newNode;
+                }
+
+                this.length++;
+            }
+
+            // 在某处插入节点
+            insert(index, node) {
+                // 越界判断
+                if (index < 0 || index > this.length) throw newError(`index: ${index} error`);
+
+                // 创建新节点
+                const newNode = new Node(node);
+
+                if (index == 0) {
+                    newNode.next = this.head;
+                    this.head = newNode;
+                } else {
+                    let i = 0,
+                        currentNode = this.head,
+                        previousNode = null;
+
+                    // 记录前一个变量和当前变量
+                    while (i++ < index) {
+                        previousNode = currentNode;
+                        currentNode = currentNode.next;
+                    }
+
+                    newNode.next = currentNode;
+                    previousNode.next = newNode;
+                }
+
+                // 长度
+                this.length++;
+            }
+
+
+            // 更新某个值
+            update(index, value) {
+                // 越界判断
+                if (index < 0 || index > this.length) throw newError(`index: ${index} error`);
+
+                let i = 0,
+                    currentNode = this.head;
+                while (i++ < index) {
+                    currentNode = currentNode.next;
+                }
+
+                currentNode.data = value;
+            }
+
+            // 根据索引获取某个值
+            get(index) {
+                // 越界判断
+                if (index < 0 || index > this.length) return null;
+
+                let i = 0,
+                    currentNode = this.head;
+
+                while (i++ < index) {
+                    currentNode = currentNode.next;
+                }
+
+                return currentNode.data;
+            }
+
+            // 查找索引
+            indexOf(value) {
+                let index = 0;
+                let notFound = -1;
+                let currentNode = this.head;
+
+                while (currentNode) {
+                    if (currentNode.data == value) {
+                        return index;
+                    }
+
+                    index++;
+                    currentNode = currentNode.next
+                }
+
+                return notFound;
+            }
+
+            // 根据索引删除
+            removeAt(index) {
+                // 越界判断
+                if (index < 0 || index > this.length) return null;
+
+                // 逻辑处理
+                if (index == 0) {
+                    this.head = this.head.next;
+                } else {
+
+                    let i = 0,
+                        previousNode = null,
+                        currentNode = this.head;
+
+                    while (i++ < index) {
+                        previousNode = currentNode;
+                        currentNode = currentNode.next;
+                    }
+
+                    previousNode.next = currentNode.next;
+                }
+
+                // 长度处理
+                this.length--;
+            }
+
+            // 根据值删除
+            remove(value) {
+                const index = this.indexOf(value);
+                this.removeAt(index)
+            }
+
+            // isEmpty
+            isEmpty() {
+                return this.length === 0;
+            }
+
+            // size
+            size() {
+                return this.length;
+            }
+
+            // toString
+            toString() {
+                let currentNode = this.head;
+                let nodeString = '';
+
+                while (currentNode) {
+                    nodeString += currentNode.data + ' ';
+                    currentNode = currentNode.next;
+                }
+
+                return nodeString;
+            }
+        }
+
+        // 节点类
+        class Node {
+            constructor(data) {
+                this.data = data;
+                this.next = null;
+            }
+        }
+
+
+        let linked = new LinkedList();
+        linked.append(1)
+        linked.append(2)
+        linked.append(4)
+        linked.insert(2, 5)
+        linked.update(2, 3)
+        console.log('toString', linked.toString())
+        let v = linked.get(2);
+        console.log('get', v)
+
+        let i = linked.indexOf(3);
+        console.log('indexof', i)
+
+        linked.removeAt(0)
+        console.log('toString', linked.toString())
+        console.log('size', linked.size())
+        console.log('isEmpty', linked.isEmpty())
+    </script>
+</body>
+
+</html>
